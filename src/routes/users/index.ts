@@ -32,7 +32,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (result === null) {
         return reply
           .code(404)
-          .send({ error: `User with id ${id} doesn't exist` });
+          .send(new Error(`User with id ${id} doesn't exist`));
       }
 
       return result;
