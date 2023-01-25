@@ -72,10 +72,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity> {
-      const profileIdToUpdate = request.params.id;
+      const postIdToUpdate = request.params.id;
 
       try {
-        return await fastify.db.posts.change(profileIdToUpdate, request.body);
+        return await fastify.db.posts.change(postIdToUpdate, request.body);
       } catch (err) {
         return reply.code(404).send(err);
       }
