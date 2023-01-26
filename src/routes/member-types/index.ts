@@ -1,8 +1,9 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
-import { idParamSchema } from "../../utils/reusedSchemas";
-import { changeMemberTypeBodySchema } from "./schema";
-import type { MemberTypeEntity } from "../../utils/DB/entities/DBMemberTypes";
+import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 
+import { idParamSchema } from '../../utils/reusedSchemas';
+import { changeMemberTypeBodySchema } from './schema';
+
+import type { MemberTypeEntity } from "../../utils/DB/entities/DBMemberTypes";
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
@@ -30,7 +31,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (result === null) {
         return reply
           .code(404)
-          .send({ error: `Mmeber type with id ${id} doesn't exist` });
+          .send({ error: `Member type with id ${id} doesn't exist` });
       }
 
       return result;
@@ -54,7 +55,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
           request.body
         );
       } catch (err) {
-        return reply.code(404).send(err);
+        return reply.code(400).send(err);
       }
     }
   );
