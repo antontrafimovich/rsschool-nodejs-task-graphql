@@ -9,6 +9,7 @@ import { MemberTypeEntity } from "../../../utils/DB/entities/DBMemberTypes";
 import { PostEntity } from "../../../utils/DB/entities/DBPosts";
 import { ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 import { UserEntity } from "../../../utils/DB/entities/DBUsers";
+import { memberTypeType } from "./entities/member-type.type";
 import { postType } from "./entities/post.type";
 import { profileType } from "./entities/profile.type";
 import { userType } from "./entities/user.type";
@@ -63,6 +64,51 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
       },
       resolve: (_source, { id }, { db: { users } }) => {
         return users.findOne({
+          key: "id",
+          equals: id,
+        });
+      },
+    },
+    post: {
+      type: postType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+          description: "id of the post",
+        },
+      },
+      resolve: (_source, { id }, { db: { posts } }) => {
+        return posts.findOne({
+          key: "id",
+          equals: id,
+        });
+      },
+    },
+    profile: {
+      type: profileType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+          description: "id of the profile",
+        },
+      },
+      resolve: (_source, { id }, { db: { profiles } }) => {
+        return profiles.findOne({
+          key: "id",
+          equals: id,
+        });
+      },
+    },
+    memberType: {
+      type: memberTypeType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+          description: "id of the member type",
+        },
+      },
+      resolve: (_source, { id }, { db: { memberTypes } }) => {
+        return memberTypes.findOne({
           key: "id",
           equals: id,
         });
