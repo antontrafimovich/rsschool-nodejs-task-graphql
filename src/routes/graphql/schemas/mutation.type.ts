@@ -1,9 +1,20 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 
-import DBUsers from "../../../utils/DB/entities/DBUsers";
-import { userType } from "./user.type";
+import { UserEntity } from "../../../utils/DB/entities/DBUsers";
+import { userType } from "./entities/user.type";
+import { ResolverContext } from "./model";
 
-export const mutationType = new GraphQLObjectType({
+export type Mutation = {
+  createUser: (args: CreateUserArgs) => UserEntity;
+};
+
+export type CreateUserArgs = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
   name: "Mutation",
   fields: () => ({
     createUser: {
@@ -25,14 +36,10 @@ export const mutationType = new GraphQLObjectType({
       },
       resolve: (
         _,
-        {
-          firstName,
-          lastName,
-          email,
-        }: { firstName: string; lastName: string; email: string },
-        { db }: { db: DBUsers }
+        { firstName, lastName, email }: CreateUserArgs,
+        { db: { users } }
       ) => {
-        return db.create({ firstName, lastName, email });
+        return users.create({ firstName, lastName, email });
       },
     },
   }),
