@@ -4,9 +4,14 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
-import DBUsers, { UserEntity } from "../../../utils/DB/entities/DBUsers";
 
-export const userType: GraphQLObjectType = new GraphQLObjectType({
+import { UserEntity } from "../../../../utils/DB/entities/DBUsers";
+import { ResolverContext } from "../model";
+
+export const userType: GraphQLObjectType = new GraphQLObjectType<
+  UserEntity,
+  ResolverContext
+>({
   name: "User",
   description: "User of an app",
   fields: () => ({
@@ -25,8 +30,8 @@ export const userType: GraphQLObjectType = new GraphQLObjectType({
     },
     subscribedToUsers: {
       type: new GraphQLNonNull(userType),
-      resolve: async (user: UserEntity, _args, { db }: { db: DBUsers }) => {
-        const result = await db.findMany({
+      resolve: async (user: UserEntity, _args, { db: { users } }) => {
+        const result = await users.findMany({
           key: "id",
           equalsAnyOf: user.subscribedToUserIds,
         });
