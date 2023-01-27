@@ -15,7 +15,9 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     return graphql({
       schema,
       source: query,
-      contextValue: { db: fastify.db.users },
+      contextValue: {
+        db: fastify.db,
+      },
     });
   };
 
@@ -30,8 +32,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const { query: source } = request.body;
 
       const result = await query(source);
-
-      console.log(`Query result is ${result}`);
 
       return result;
     }
