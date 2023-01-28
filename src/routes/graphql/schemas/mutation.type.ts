@@ -1,4 +1,9 @@
-import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
+import {
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from "graphql";
 
 import { UserEntity } from "../../../utils/DB/entities/DBUsers";
 import { userType } from "./entities/user.type";
@@ -12,6 +17,12 @@ export type CreateUserArgs = {
   firstName: string;
   lastName: string;
   email: string;
+};
+
+export type CreatePostArgs = {
+  title: string;
+  content: string;
+  userId: string;
 };
 
 export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
@@ -40,6 +51,27 @@ export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
         { db: { users } }
       ) => {
         return users.create({ firstName, lastName, email });
+      },
+    },
+    createPost: {
+      type: new GraphQLNonNull(userType),
+      description: "Creates new user",
+      args: {
+        title: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: "Title of the post",
+        },
+        content: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: "Content of the post",
+        },
+        userId: {
+          type: new GraphQLNonNull(GraphQLID),
+          description: "User id",
+        },
+      },
+      resolve: (_, args: CreatePostArgs, { db: { posts } }) => {
+        return posts.create(args);
       },
     },
   }),
