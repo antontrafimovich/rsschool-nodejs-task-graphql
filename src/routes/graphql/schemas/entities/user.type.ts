@@ -1,22 +1,19 @@
-import { GraphQLID, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
+import {
+  GraphQLID,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
+} from "graphql";
 
-import { MemberTypeEntity } from '../../../../utils/DB/entities/DBMemberTypes';
-import { PostEntity } from '../../../../utils/DB/entities/DBPosts';
-import { ProfileEntity } from '../../../../utils/DB/entities/DBProfiles';
-import { UserEntity } from '../../../../utils/DB/entities/DBUsers';
-import { ResolverContext } from '../model';
-import { memberTypeType } from './member-type.type';
-import { postType } from './post.type';
-import { profileType } from './profile.type';
-
-type UserType = UserEntity & {
-  posts: PostEntity[];
-  profile: ProfileEntity;
-  memberType: MemberTypeEntity;
-};
+import { UserEntity } from "../../../../utils/DB/entities/DBUsers";
+import { ResolverContext } from "../model";
+import { memberTypeType } from "./member-type.type";
+import { postType } from "./post.type";
+import { profileType } from "./profile.type";
 
 export const userType: GraphQLObjectType = new GraphQLObjectType<
-  UserType,
+  UserEntity,
   ResolverContext
 >({
   name: "User",
@@ -55,10 +52,25 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
     },
     memberType: {
       type: memberTypeType,
-      resolve: (user: UserType, _args, { db: { memberTypes } }) => {
+      resolve: async (
+        user: UserEntity,
+        _args,
+        { db: { memberTypes, profiles } }
+      ) => {
+        const profile = await profiles.findOne({
+          key: "userId",
+          equals: user.id,
+        });
+
+        if (profile === null) {
+          throw new Error(
+            "Cannot find member type because this user doesn't have a profile"
+          );
+        }
+
         return memberTypes.findOne({
           key: "id",
-          equals: user.profile.memberTypeId,
+          equals: profile.memberTypeId,
         });
       },
     },
