@@ -1,13 +1,17 @@
 import {
   GraphQLID,
+  GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+import { ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 
 import { UserEntity } from "../../../utils/DB/entities/DBUsers";
+import { profileType } from "./entities/profile.type";
 import { userType } from "./entities/user.type";
 import { ResolverContext } from "./model";
+import { sexType } from "./shared";
 
 export type Mutation = {
   createUser: (args: CreateUserArgs) => UserEntity;
@@ -24,6 +28,8 @@ export type CreatePostArgs = {
   content: string;
   userId: string;
 };
+
+export type CreateProfileArgs = Omit<ProfileEntity, "id">;
 
 export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
   name: "Mutation",
@@ -55,7 +61,7 @@ export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
     },
     createPost: {
       type: new GraphQLNonNull(userType),
-      description: "Creates new user",
+      description: "Creates new post",
       args: {
         title: {
           type: new GraphQLNonNull(GraphQLString),
@@ -72,6 +78,36 @@ export const mutationType = new GraphQLObjectType<Mutation, ResolverContext>({
       },
       resolve: (_, args: CreatePostArgs, { db: { posts } }) => {
         return posts.create(args);
+      },
+    },
+    createProfile: {
+      type: new GraphQLNonNull(profileType),
+      description: "Creates new user profile",
+      args: {
+        avatar: {
+          type: GraphQLString,
+        },
+        sex: {
+          type: sexType,
+        },
+        birthday: {
+          type: GraphQLInt,
+        },
+        country: {
+          type: GraphQLString,
+        },
+        street: {
+          type: GraphQLString,
+        },
+        city: {
+          type: GraphQLString,
+        },
+        memberTypeId: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+        userId: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
       },
     },
   }),
