@@ -1,16 +1,13 @@
-import {
-  GraphQLID,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLString,
-} from "graphql";
-import { PostEntity } from "../../../../utils/DB/entities/DBPosts";
+import { GraphQLID, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
 
-import { UserEntity } from "../../../../utils/DB/entities/DBUsers";
-import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
-import { MemberTypeEntity } from "../../../../utils/DB/entities/DBMemberTypes";
-import { ResolverContext } from "../model";
-import { profileType } from "./profile.type";
+import { MemberTypeEntity } from '../../../../utils/DB/entities/DBMemberTypes';
+import { PostEntity } from '../../../../utils/DB/entities/DBPosts';
+import { ProfileEntity } from '../../../../utils/DB/entities/DBProfiles';
+import { UserEntity } from '../../../../utils/DB/entities/DBUsers';
+import { ResolverContext } from '../model';
+import { memberTypeType } from './member-type.type';
+import { postType } from './post.type';
+import { profileType } from './profile.type';
 
 type UserType = UserEntity & {
   posts: PostEntity[];
@@ -39,7 +36,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       type: new GraphQLNonNull(GraphQLString),
     },
     posts: {
-      type: new GraphQLNonNull(profileType),
+      type: new GraphQLList(postType),
       resolve: (user: UserEntity, _args, { db: { posts } }) => {
         return posts.findMany({
           key: "userId",
@@ -48,7 +45,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       },
     },
     profile: {
-      type: new GraphQLNonNull(profileType),
+      type: profileType,
       resolve: (user: UserEntity, _args, { db: { profiles } }) => {
         return profiles.findOne({
           key: "userId",
@@ -57,7 +54,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       },
     },
     memberType: {
-      type: new GraphQLNonNull(profileType),
+      type: memberTypeType,
       resolve: (user: UserType, _args, { db: { memberTypes } }) => {
         return memberTypes.findOne({
           key: "id",
