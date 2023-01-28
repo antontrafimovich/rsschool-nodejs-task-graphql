@@ -1,26 +1,15 @@
 import {
-  GraphQLEnumType,
   GraphQLID,
   GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
 import { ResolverContext } from "../model";
 import { memberTypeType } from "./member-type.type";
-
-const sexType = new GraphQLEnumType({
-  name: "Sex",
-  values: {
-    Male: {
-      value: "male",
-    },
-    Female: {
-      value: "female",
-    },
-  },
-});
+import { sexType } from "../shared/sex.type";
 
 export const profileType: GraphQLObjectType = new GraphQLObjectType<
   ProfileEntity,
