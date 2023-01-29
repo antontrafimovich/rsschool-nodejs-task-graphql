@@ -29,15 +29,15 @@ export const updateUser: GraphQLFieldConfig<any, ResolverContext> = {
         name: "UpdateUserParameters",
         fields: () => ({
           firstName: {
-            type: new GraphQLNonNull(GraphQLString),
+            type: GraphQLString,
             description: "First name of the user",
           },
           lastName: {
-            type: new GraphQLNonNull(GraphQLString),
+            type: GraphQLString,
             description: "Last name of the user",
           },
           email: {
-            type: new GraphQLNonNull(GraphQLString),
+            type: GraphQLString,
             description: "Email of the user",
           },
           subscribedToUserIds: {
