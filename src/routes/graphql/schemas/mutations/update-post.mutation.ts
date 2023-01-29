@@ -7,7 +7,7 @@ import {
 } from "graphql";
 
 import { PostEntity } from "../../../../utils/DB/entities/DBPosts";
-import { userType } from "../entities/user.type";
+import { postType } from "../entities";
 import { ResolverContext } from "../model";
 
 export type UpdatePostArgs = {
@@ -16,7 +16,7 @@ export type UpdatePostArgs = {
 };
 
 export const updatePost: GraphQLFieldConfig<any, ResolverContext> = {
-  type: new GraphQLNonNull(userType),
+  type: new GraphQLNonNull(postType),
   description: "Update post",
   args: {
     id: {

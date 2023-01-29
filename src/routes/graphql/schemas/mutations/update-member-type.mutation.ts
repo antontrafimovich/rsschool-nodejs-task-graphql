@@ -1,13 +1,13 @@
 import {
   GraphQLFieldConfig,
-  GraphQLID,
   GraphQLInputObjectType,
   GraphQLInt,
   GraphQLNonNull,
+  GraphQLString,
 } from "graphql";
 
 import { MemberTypeEntity } from "../../../../utils/DB/entities/DBMemberTypes";
-import { userType } from "../entities/user.type";
+import { memberTypeType } from "../entities";
 import { ResolverContext } from "../model";
 
 export type UpdateMemberTypeArgs = {
@@ -16,11 +16,11 @@ export type UpdateMemberTypeArgs = {
 };
 
 export const updateMemberType: GraphQLFieldConfig<any, ResolverContext> = {
-  type: new GraphQLNonNull(userType),
+  type: new GraphQLNonNull(memberTypeType),
   description: "Update member type",
   args: {
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLString),
       description: "id of the member type",
     },
     params: {

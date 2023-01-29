@@ -8,7 +8,7 @@ import {
 } from "graphql";
 
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
-import { userType } from "../entities/user.type";
+import { profileType } from "../entities";
 import { ResolverContext } from "../model";
 import { sexType } from "../shared";
 
@@ -18,7 +18,7 @@ export type UpdateProfileArgs = {
 };
 
 export const updateProfile: GraphQLFieldConfig<any, ResolverContext> = {
-  type: new GraphQLNonNull(userType),
+  type: new GraphQLNonNull(profileType),
   description: "Update profile",
   args: {
     id: {
@@ -48,9 +48,6 @@ export const updateProfile: GraphQLFieldConfig<any, ResolverContext> = {
             type: GraphQLString,
           },
           memberTypeId: {
-            type: new GraphQLNonNull(GraphQLID),
-          },
-          userId: {
             type: new GraphQLNonNull(GraphQLID),
           },
         }),
