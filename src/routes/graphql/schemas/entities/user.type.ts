@@ -74,7 +74,20 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         });
       },
     },
-    subscribedToUsers: {
+    subscribedToUser: {
+      type: new GraphQLList(userType),
+      resolve: async (user: UserEntity, _args, { db: { users } }) => {
+        const subsctibedToId = user.id;
+
+        const result = await users.findMany({
+          key: "subscribedToUserIds",
+          inArray: subsctibedToId,
+        });
+
+        return result;
+      },
+    },
+    userSubscribedTo: {
       type: new GraphQLNonNull(userType),
       resolve: async (user: UserEntity, _args, { db: { users } }) => {
         const result = await users.findMany({
