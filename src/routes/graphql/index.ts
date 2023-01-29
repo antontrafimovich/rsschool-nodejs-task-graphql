@@ -1,12 +1,15 @@
 import { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
 import { graphql } from "graphql/graphql";
 
+import { getUserService } from "../../services";
 import { graphqlBodySchema } from "./schema";
 import { schema } from "./schemas";
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
+  const userService = getUserService(fastify.db);
+
   const query = (
     query: string | undefined,
     variables:
@@ -25,6 +28,9 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       variableValues: variables,
       contextValue: {
         db: fastify.db,
+        services: {
+          userService,
+        },
       },
     });
   };
