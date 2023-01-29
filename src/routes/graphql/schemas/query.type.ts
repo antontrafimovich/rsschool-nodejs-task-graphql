@@ -3,9 +3,10 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLString,
 } from "graphql";
-import { MemberTypeEntity } from "../../../utils/DB/entities/DBMemberTypes";
 
+import { MemberTypeEntity } from "../../../utils/DB/entities/DBMemberTypes";
 import { PostEntity } from "../../../utils/DB/entities/DBPosts";
 import { ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 import { UserEntity } from "../../../utils/DB/entities/DBUsers";
@@ -103,7 +104,7 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
       type: memberTypeType,
       args: {
         id: {
-          type: new GraphQLNonNull(GraphQLID),
+          type: new GraphQLNonNull(GraphQLString),
           description: "id of the member type",
         },
       },
