@@ -16,12 +16,12 @@ export const unsubscribeFromUser: GraphQLFieldConfig<any, ResolverContext> = {
       type: new GraphQLNonNull(GraphQLID),
       description: "id of the user",
     },
-    userToUnubscribeId: {
+    userToUnsubscribeId: {
       type: new GraphQLNonNull(GraphQLID),
       description: "User id to unsubscribe",
     },
   },
   resolve: (_, args: UnsubscribeFromArgs, { services: { userService } }) => {
-    return userService.subscribe(args.userId, args.userToUnsubscribeId);
+    return userService.unsubscribe(args.userId, args.userToUnsubscribeId);
   },
 };
