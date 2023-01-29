@@ -8,12 +8,15 @@ import {
 } from "./schemas";
 
 import type { UserEntity } from "../../utils/DB/entities/DBUsers";
+import { getUserService } from "../../services";
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
+  const userService = getUserService(fastify.db);
+
   fastify.get("/", async function (request, reply): Promise<UserEntity[]> {
-    return fastify.db.users.findMany();
+    return userService.getAll();
   });
 
   fastify.get(
@@ -26,18 +29,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     async function (request, reply): Promise<UserEntity> {
       const { id } = request.params;
 
-      const result = await fastify.db.users.findOne({
-        key: "id",
-        equals: id,
-      });
-
-      if (result === null) {
-        return reply
-          .code(404)
-          .send(new Error(`User with id ${id} doesn't exist`));
+      try {
+        return await userService.getById(id);
+      } catch (err) {
+        return reply.code(404).send(err);
       }
-
-      return result;
     }
   );
 
@@ -49,7 +45,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      return fastify.db.users.create(request.body);
+      return userService.create(request.body);
     }
   );
 
@@ -140,36 +136,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const userIdToSubscribe = request.params.id;
       const userIdToUpdate = request.body.userId;
 
-      const userToSubscribe = await fastify.db.users.findOne({
-        key: "id",
-        equals: userIdToSubscribe,
-      });
-
-      if (userToSubscribe === null) {
-        return reply
-          .code(400)
-          .send(new Error(`User with id ${userIdToSubscribe} doesn't exist`));
+      try {
+        return await userService.subscribe(userIdToUpdate, userIdToSubscribe);
+      } catch (err) {
+        return reply.code(400).send(err);
       }
-
-      const userToUpdate = await fastify.db.users.findOne({
-        key: "id",
-        equals: userIdToUpdate,
-      });
-
-      if (userToUpdate === null) {
-        return reply
-          .code(400)
-          .send({ error: `User with id ${userIdToUpdate} doesn't exist` });
-      }
-
-      const newSubscriptions = [
-        ...userToUpdate.subscribedToUserIds,
-        userIdToSubscribe,
-      ];
-
-      return fastify.db.users.change(userIdToUpdate, {
-        subscribedToUserIds: newSubscriptions,
-      });
     }
   );
 
@@ -185,46 +156,14 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const userIdToUnsubscribe = request.params.id;
       const userIdToUpdate = request.body.userId;
 
-      const userToUnsubscribe = await fastify.db.users.findOne({
-        key: "id",
-        equals: userIdToUpdate,
-      });
-
-      if (userToUnsubscribe === null) {
-        return reply
-          .code(400)
-          .send({ error: `User with id ${userIdToUnsubscribe} doesn't exist` });
+      try {
+        return await userService.unsubscribe(
+          userIdToUpdate,
+          userIdToUnsubscribe
+        );
+      } catch (err) {
+        return reply.code(400).send(err);
       }
-
-      const userToUpdate = await fastify.db.users.findOne({
-        key: "id",
-        equals: userIdToUpdate,
-      });
-
-      if (userToUpdate === null) {
-        return reply
-          .code(400)
-          .send({ error: `User with id ${userIdToUpdate} doesn't exist` });
-      }
-
-      const isSubscribed =
-        userToUpdate.subscribedToUserIds.includes(userIdToUnsubscribe);
-
-      if (!isSubscribed) {
-        return reply
-          .code(400)
-          .send(
-            `User with id ${userIdToUpdate} is not subscribed to user with id ${userIdToUnsubscribe}`
-          );
-      }
-
-      const newSubscriptions = userToUpdate.subscribedToUserIds.filter(
-        (id) => id !== userIdToUnsubscribe
-      );
-
-      return fastify.db.users.change(userIdToUpdate, {
-        subscribedToUserIds: newSubscriptions,
-      });
     }
   );
 
@@ -240,7 +179,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const userIdToUpdate = request.params.id;
 
       try {
-        return await fastify.db.users.change(userIdToUpdate, request.body);
+        return await userService.change(userIdToUpdate, request.body);
       } catch (err) {
         return reply.code(400).send(err);
       }
