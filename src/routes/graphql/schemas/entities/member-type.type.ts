@@ -1,8 +1,8 @@
 import {
-  GraphQLID,
   GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLString,
 } from "graphql";
 
 import { MemberTypeEntity } from "../../../../utils/DB/entities/DBMemberTypes";
@@ -16,7 +16,7 @@ export const memberTypeType: GraphQLObjectType = new GraphQLObjectType<
   description: "Type of membership in the app",
   fields: () => ({
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: new GraphQLNonNull(GraphQLString),
       description: "The id of the member type",
     },
     discount: {
