@@ -6,3 +6,4 @@ export * from "./update-post.mutation";
 export * from "./update-user.mutation";
 export * from "./update-member-type.mutation";
 export * from "./subscribe-to.mutation";
+export * from "./unsubscribe-from.mutation";

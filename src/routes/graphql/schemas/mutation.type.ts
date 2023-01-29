@@ -6,6 +6,7 @@ import {
   createProfile,
   createUser,
   subscribeToUser,
+  unsubscribeFromUser,
   updateMemberType,
   updatePost,
   updateProfile,
@@ -23,5 +24,6 @@ export const mutationType = new GraphQLObjectType<any, ResolverContext>({
     updateProfile,
     updateMemberType,
     subscribeToUser,
+    unsubscribeFromUser,
   }),
 });
