@@ -63,9 +63,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         });
 
         if (profile === null) {
-          throw new Error(
-            "Cannot find member type because this user doesn't have a profile"
-          );
+          return null
         }
 
         return memberTypes.findOne({
@@ -88,7 +86,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       },
     },
     userSubscribedTo: {
-      type: new GraphQLNonNull(userType),
+      type: new GraphQLList(userType),
       resolve: async (user: UserEntity, _args, { db: { users } }) => {
         const result = await users.findMany({
           key: "id",
