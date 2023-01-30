@@ -43,11 +43,17 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
     },
     profile: {
       type: profileType,
-      resolve: (user: UserEntity, _args, { db: { profiles } }) => {
-        return profiles.findOne({
-          key: "userId",
-          equals: user.id,
-        });
+      resolve: async (
+        user: UserEntity,
+        _args,
+        { services: { profileService } }
+      ) => {
+        try {
+          return await profileService.getByUserId(user.id);
+        } catch (err) {
+          console.error(err);
+          return null;
+        }
       },
     },
     memberType: {
@@ -63,7 +69,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         });
 
         if (profile === null) {
-          return null
+          return null;
         }
 
         return memberTypes.findOne({
@@ -74,24 +80,24 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
     },
     subscribedToUser: {
       type: new GraphQLList(userType),
-      resolve: async (user: UserEntity, _args, { db: { users } }) => {
-        const subsctibedToId = user.id;
-
-        const result = await users.findMany({
-          key: "subscribedToUserIds",
-          inArray: subsctibedToId,
-        });
+      resolve: async (
+        user: UserEntity,
+        _args,
+        { services: { userService }    }
+      ) => {
+        const result = await userService.getSubscribedToUser(user.id);
 
         return result;
       },
     },
     userSubscribedTo: {
       type: new GraphQLList(userType),
-      resolve: async (user: UserEntity, _args, { db: { users } }) => {
-        const result = await users.findMany({
-          key: "id",
-          equalsAnyOf: user.subscribedToUserIds,
-        });
+      resolve: async (
+        user: UserEntity,
+        _args,
+        { services: { userService } }
+      ) => {
+        const result = await userService.getByIds(user.subscribedToUserIds);
 
         return result;
       },
