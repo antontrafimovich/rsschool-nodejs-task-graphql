@@ -1,9 +1,12 @@
+import DataLoader = require("dataloader");
 import DB from "../utils/DB/DB";
 import { UserEntity } from "../utils/DB/entities/DBUsers";
 
 export interface UserService {
   getAll(): Promise<UserEntity[]>;
   getById(id: string): Promise<UserEntity>;
+  getByIds(ids: string[]): Promise<UserEntity[]>;
+  getSubscribedToUser(id: string): Promise<UserEntity[]>;
   create(
     params: Omit<UserEntity, "id" | "subscribedToUserIds">
   ): Promise<UserEntity>;
@@ -16,21 +19,47 @@ export interface UserService {
 }
 
 export const getUserService = (db: DB): UserService => {
+  const batchUserRequests = (ids: readonly string[]) => {
+    return db.users.findMany({
+      key: "id",
+      equalsAnyOf: ids as string[],
+    });
+  };
+
+  const loader = new DataLoader(batchUserRequests);
+
+  const batchSubscribedToUserRequests = async (ids: readonly string[]) => {
+    const users = await db.users.findMany();
+
+    return ids.map((id) => {
+      const subscribers = users.filter((user) =>
+        user.subscribedToUserIds.includes(id)
+      );
+
+      return subscribers;
+    });
+  };
+
+  const subscribedToUserLoader = new DataLoader(batchSubscribedToUserRequests);
+
   return {
     getAll: () => {
       return db.users.findMany();
     },
     getById: async (id: string) => {
-      const result = await db.users.findOne({
-        key: "id",
-        equals: id,
-      });
+      const result = loader.load(id);
 
       if (result === null) {
-        throw new Error(`Post with id ${id} doesn't exist`);
+        throw new Error(`User with id ${id} doesn't exist`);
       }
 
       return result;
+    },
+    getByIds: (ids: string[]) => {
+      return loader.loadMany(ids) as Promise<UserEntity[]>;
+    },
+    getSubscribedToUser: (id: string) => {
+      return subscribedToUserLoader.load(id);
     },
     create: (params: Omit<UserEntity, "id" | "subscribedToUserIds">) => {
       return db.users.create(params);
