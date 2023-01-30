@@ -1,7 +1,7 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
 
-import { idParamSchema } from '../../utils/reusedSchemas';
-import { changePostBodySchema, createPostBodySchema } from './schema';
+import { idParamSchema } from "../../utils/reusedSchemas";
+import { changePostBodySchema, createPostBodySchema } from "./schema";
 
 import type { PostEntity } from "../../utils/DB/entities/DBPosts";
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
