@@ -44,8 +44,8 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
     posts: {
       type: new GraphQLList(postType),
       description: "List of posts",
-      resolve: (_, __, { db: { posts } }) => {
-        return posts.findMany();
+      resolve: (_, __, { services: { postService } }) => {
+        return postService.getAll();
       },
     },
     memberTypes: {
@@ -79,11 +79,12 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
           description: "id of the post",
         },
       },
-      resolve: (_source, { id }, { db: { posts } }) => {
-        return posts.findOne({
-          key: "id",
-          equals: id,
-        });
+      resolve: async (_source, { id }, { services: { postService } }) => {
+        try {
+          return await postService.getById(id);
+        } catch (err) {
+          return null;
+        }
       },
     },
     profile: {

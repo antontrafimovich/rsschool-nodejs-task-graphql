@@ -34,11 +34,16 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
     },
     posts: {
       type: new GraphQLList(postType),
-      resolve: (user: UserEntity, _args, { db: { posts } }) => {
-        return posts.findMany({
-          key: "userId",
-          equals: user.id,
-        });
+      resolve: async (
+        user: UserEntity,
+        _args,
+        { services: { postService } }
+      ) => {
+        try {
+          return await postService.getByUserId(user.id);
+        } catch (err) {
+          return null;
+        }
       },
     },
     profile: {

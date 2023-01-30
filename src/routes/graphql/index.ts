@@ -3,6 +3,7 @@ import { graphql } from "graphql/graphql";
 
 import {
   getMemberTypeService,
+  getPostService,
   getProfileService,
   getUserService,
 } from "../../services";
@@ -14,6 +15,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
 ): Promise<void> => {
   const userService = getUserService(fastify.db);
   const memberTypeService = getMemberTypeService(fastify.db);
+  const postService = getPostService(fastify.db);
   const profileService = getProfileService(
     fastify.db,
     userService,
@@ -42,6 +44,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
           userService,
           profileService,
           memberTypeService,
+          postService,
         },
       },
     });

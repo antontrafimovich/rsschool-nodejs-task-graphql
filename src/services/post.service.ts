@@ -7,6 +7,7 @@ import { isError } from "./utils";
 export interface PostService {
   getAll(): Promise<PostEntity[]>;
   getById(id: string): Promise<PostEntity>;
+  getByUserId(userId: string): Promise<PostEntity>;
   create(params: Omit<PostEntity, "id">): Promise<PostEntity>;
   change(
     id: string,
@@ -34,12 +35,42 @@ export const getPostService = (db: DB) => {
 
   const postsByIdLoader = new DataLoader(postsByIdBatchLoadFn);
 
+  const postsByUserIdBatchLoadFn = async (userIds: readonly string[]) => {
+    const result = await db.posts.findMany({
+      key: "userId",
+      equalsAnyOf: userIds as string[],
+    });
+
+    return userIds.map((userId) => {
+      const posts = result.filter((post) => post.userId === userId);
+
+      if (posts.length) {
+        return posts;
+      }
+
+      return new Error(`There're no posts for user with id ${userId}`);
+    });
+  };
+
+  const postsByUserIdsLoader = new DataLoader(postsByUserIdBatchLoadFn, {
+    cache: false,
+  });
+
   return {
     getAll: () => {
       return db.posts.findMany();
     },
     getById: async (id: string) => {
       const result = postsByIdLoader.load(id);
+
+      if (isError(result)) {
+        throw result;
+      }
+
+      return result;
+    },
+    getByUserId: async (userId: string) => {
+      const result = postsByUserIdsLoader.load(userId);
 
       if (isError(result)) {
         throw result;
