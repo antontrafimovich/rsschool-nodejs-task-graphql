@@ -30,15 +30,15 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
     users: {
       type: new GraphQLList(userType),
       description: "List of users",
-      resolve: (_, __, { db: { users } }) => {
-        return users.findMany();
+      resolve: (_, __, { services: { userService } }) => {
+        return userService.getAll();
       },
     },
     profiles: {
       type: new GraphQLList(profileType),
       description: "List of profiles",
-      resolve: (_, __, { db: { profiles } }) => {
-        return profiles.findMany();
+      resolve: (_, __, { services: { profileService } }) => {
+        return profileService.getAll();
       },
     },
     posts: {

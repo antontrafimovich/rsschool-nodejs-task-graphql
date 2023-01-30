@@ -1,14 +1,17 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
+import { FastifyPluginAsyncJsonSchemaToTs } from "@fastify/type-provider-json-schema-to-ts";
 
-import { idParamSchema } from '../../utils/reusedSchemas';
-import { changeProfileBodySchema, createProfileBodySchema } from './schema';
+import { idParamSchema } from "../../utils/reusedSchemas";
+import { changeProfileBodySchema, createProfileBodySchema } from "./schema";
 
 import type { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
+import { getProfileService } from "../../services";
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get("/", async function (request, reply): Promise<ProfileEntity[]> {
-    return fastify.db.profiles.findMany();
+  const profileService = getProfileService(fastify.db);
+
+  fastify.get("/", function (request, reply): Promise<ProfileEntity[]> {
+    return profileService.getAll();
   });
 
   fastify.get(
@@ -21,18 +24,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     async function (request, reply): Promise<ProfileEntity> {
       const { id } = request.params;
 
-      const result = await fastify.db.profiles.findOne({
-        key: "id",
-        equals: id,
-      });
-
-      if (result === null) {
-        return reply
-          .code(404)
-          .send({ error: `Profile with id ${id} doesn't exist` });
+      try {
+        return await profileService.getById(id);
+      } catch (err) {
+        return reply.code(404).send(err);
       }
-
-      return result;
     }
   );
 
@@ -44,46 +40,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      const { userId } = request.body;
-
-      const user = await fastify.db.users.findOne({
-        key: "id",
-        equals: userId,
-      });
-
-      if (user === null) {
-        return reply
-          .code(400)
-          .send(new Error(`User with id ${userId} doesn't exist.`));
+      try {
+        return await profileService.create(request.body);
+      } catch (err) {
+        return reply.code(400).send(err);
       }
-
-      const profile = await fastify.db.profiles.findOne({
-        key: "userId",
-        equals: userId,
-      });
-
-      if (profile !== null) {
-        return reply
-          .code(400)
-          .send(new Error(`User with id ${userId} already has profile.`));
-      }
-
-      const { memberTypeId } = request.body;
-
-      const memberType = await fastify.db.memberTypes.findOne({
-        key: "id",
-        equals: memberTypeId,
-      });
-
-      if (memberType === null) {
-        return reply
-          .code(400)
-          .send(
-            new Error(`Member type with id ${memberTypeId} doesn't exist.`)
-          );
-      }
-
-      return fastify.db.profiles.create(request.body);
     }
   );
 
@@ -117,10 +78,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const { id: profileIdToUpdate } = request.params;
 
       try {
-        return await fastify.db.profiles.change(
-          profileIdToUpdate,
-          request.body
-        );
+        return await profileService.change(profileIdToUpdate, request.body);
       } catch (err) {
         return reply.code(400).send(err);
       }
