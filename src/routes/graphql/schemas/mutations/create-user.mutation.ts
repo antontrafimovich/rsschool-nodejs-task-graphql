@@ -1,15 +1,21 @@
-import { GraphQLFieldConfig, GraphQLNonNull, GraphQLString } from "graphql";
+import {
+  GraphQLFieldConfig,
+  GraphQLInputObjectType,
+  GraphQLNonNull,
+  GraphQLString,
+} from "graphql";
 
 import { UserEntity } from "../../../../utils/DB/entities/DBUsers";
 import { userType } from "../entities/user.type";
 import { ResolverContext } from "../model";
 
-export type CreateUserArgs = Omit<UserEntity, "id" | "subscribedToUserIds">;
+export type CreateUserArgs = {
+  input: Omit<UserEntity, "id" | "subscribedToUserIds">;
+};
 
-export const createUser: GraphQLFieldConfig<any, ResolverContext> = {
-  type: new GraphQLNonNull(userType),
-  description: "Creates new user",
-  args: {
+const createUserInputType = new GraphQLInputObjectType({
+  name: "CreateUserInput",
+  fields: {
     firstName: {
       type: new GraphQLNonNull(GraphQLString),
       description: "First name of the user",
@@ -23,7 +29,18 @@ export const createUser: GraphQLFieldConfig<any, ResolverContext> = {
       description: "Email of the user",
     },
   },
+});
+
+export const createUser: GraphQLFieldConfig<any, ResolverContext> = {
+  type: new GraphQLNonNull(userType),
+  description: "Creates new user",
+  args: {
+    input: {
+      type: new GraphQLNonNull(createUserInputType),
+      description: "Create user DTO",
+    },
+  },
   resolve: (_, args: CreateUserArgs, { services: { userService } }) => {
-    return userService.create(args);
+    return userService.create(args.input);
   },
 };

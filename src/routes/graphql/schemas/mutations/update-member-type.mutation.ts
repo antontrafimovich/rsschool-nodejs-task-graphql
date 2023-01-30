@@ -15,6 +15,20 @@ export type UpdateMemberTypeArgs = {
   params: Partial<Omit<MemberTypeEntity, "id">>;
 };
 
+const updateMemberTypeType = new GraphQLInputObjectType({
+  name: "UpdateMemberTypeInput",
+  fields: () => ({
+    discount: {
+      type: GraphQLInt,
+      description: "Some discount",
+    },
+    monthPostsLimit: {
+      type: GraphQLInt,
+      description: "Limit of posts to be created during month.",
+    },
+  }),
+});
+
 export const updateMemberType: GraphQLFieldConfig<any, ResolverContext> = {
   type: new GraphQLNonNull(memberTypeType),
   description: "Update member type",
@@ -24,18 +38,8 @@ export const updateMemberType: GraphQLFieldConfig<any, ResolverContext> = {
       description: "id of the member type",
     },
     params: {
-      type: new GraphQLInputObjectType({
-        name: "UpdateMemberTypeParameters",
-        fields: () => ({
-          discount: {
-            type: GraphQLInt,
-          },
-          monthPostsLimit: {
-            type: GraphQLInt,
-          },
-        }),
-      }),
-      description: "Member type update params",
+      type: new GraphQLNonNull(updateMemberTypeType),
+      description: "Update member type DTO",
     },
   },
   resolve: (

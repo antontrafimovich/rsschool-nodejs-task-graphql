@@ -16,6 +16,28 @@ export type UpdateUserArgs = {
   params: Partial<Omit<UserEntity, "id">>;
 };
 
+const updateUserInputType = new GraphQLInputObjectType({
+  name: "UpdateUserInput",
+  fields: () => ({
+    firstName: {
+      type: GraphQLString,
+      description: "First name of the user",
+    },
+    lastName: {
+      type: GraphQLString,
+      description: "Last name of the user",
+    },
+    email: {
+      type: GraphQLString,
+      description: "Email of the user",
+    },
+    subscribedToUserIds: {
+      type: new GraphQLList(GraphQLID),
+      description: "User's subscriptions list",
+    },
+  }),
+});
+
 export const updateUser: GraphQLFieldConfig<any, ResolverContext> = {
   type: new GraphQLNonNull(userType),
   description: "Update user",
@@ -25,28 +47,8 @@ export const updateUser: GraphQLFieldConfig<any, ResolverContext> = {
       description: "id of the user",
     },
     params: {
-      type: new GraphQLInputObjectType({
-        name: "UpdateUserParameters",
-        fields: () => ({
-          firstName: {
-            type: GraphQLString,
-            description: "First name of the user",
-          },
-          lastName: {
-            type: GraphQLString,
-            description: "Last name of the user",
-          },
-          email: {
-            type: GraphQLString,
-            description: "Email of the user",
-          },
-          subscribedToUserIds: {
-            type: new GraphQLList(GraphQLID),
-            description: "User's subscriptions list",
-          },
-        }),
-      }),
-      description: "User update params",
+      type: new GraphQLNonNull(updateUserInputType),
+      description: "User update DTO",
     },
   },
   resolve: (_, args: UpdateUserArgs, { services: { userService } }) => {

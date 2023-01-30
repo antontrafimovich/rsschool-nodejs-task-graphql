@@ -17,6 +17,33 @@ export type UpdateProfileArgs = {
   params: Partial<Omit<ProfileEntity, "id" | "userId">>;
 };
 
+const updateProfileInputType = new GraphQLInputObjectType({
+  name: "UpdateProfileInput",
+  fields: () => ({
+    avatar: {
+      type: GraphQLString,
+    },
+    sex: {
+      type: sexType,
+    },
+    birthday: {
+      type: GraphQLInt,
+    },
+    country: {
+      type: GraphQLString,
+    },
+    street: {
+      type: GraphQLString,
+    },
+    city: {
+      type: GraphQLString,
+    },
+    memberTypeId: {
+      type: GraphQLID,
+    },
+  }),
+});
+
 export const updateProfile: GraphQLFieldConfig<any, ResolverContext> = {
   type: new GraphQLNonNull(profileType),
   description: "Update profile",
@@ -26,33 +53,8 @@ export const updateProfile: GraphQLFieldConfig<any, ResolverContext> = {
       description: "id of the profile",
     },
     params: {
-      type: new GraphQLInputObjectType({
-        name: "UpdateProfileParameters",
-        fields: () => ({
-          avatar: {
-            type: GraphQLString,
-          },
-          sex: {
-            type: sexType,
-          },
-          birthday: {
-            type: GraphQLInt,
-          },
-          country: {
-            type: GraphQLString,
-          },
-          street: {
-            type: GraphQLString,
-          },
-          city: {
-            type: GraphQLString,
-          },
-          memberTypeId: {
-            type: new GraphQLNonNull(GraphQLID),
-          },
-        }),
-      }),
-      description: "Profile update params",
+      type: new GraphQLNonNull(updateProfileInputType),
+      description: "Update profile DTO",
     },
   },
   resolve: (_, args: UpdateProfileArgs, { services: { profileService } }) => {

@@ -1,7 +1,8 @@
 import {
   GraphQLFieldConfig,
+  GraphQLFloat,
   GraphQLID,
-  GraphQLInt,
+  GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLString,
 } from "graphql";
@@ -11,29 +12,28 @@ import { profileType } from "../entities";
 import { ResolverContext } from "../model";
 import { sexType } from "../shared";
 
-export type CreateProfileArgs = Omit<ProfileEntity, "id">;
+export type CreateProfileArgs = { input: Omit<ProfileEntity, "id"> };
 
-export const createProfile: GraphQLFieldConfig<any, ResolverContext> = {
-  type: new GraphQLNonNull(profileType),
-  description: "Creates new user profile",
-  args: {
+const createProfileInputType = new GraphQLInputObjectType({
+  name: "CreateProfileInput",
+  fields: {
     avatar: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     sex: {
-      type: sexType,
+      type: new GraphQLNonNull(sexType),
     },
     birthday: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLFloat),
     },
     country: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     street: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     city: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
     memberTypeId: {
       type: new GraphQLNonNull(GraphQLID),
@@ -42,7 +42,18 @@ export const createProfile: GraphQLFieldConfig<any, ResolverContext> = {
       type: new GraphQLNonNull(GraphQLID),
     },
   },
+});
+
+export const createProfile: GraphQLFieldConfig<any, ResolverContext> = {
+  type: new GraphQLNonNull(profileType),
+  description: "Creates new user profile",
+  args: {
+    input: {
+      type: new GraphQLNonNull(createProfileInputType),
+      description: "Create profile DTO",
+    },
+  },
   resolve: (_, args: CreateProfileArgs, { services: { profileService } }) => {
-    return profileService.create(args);
+    return profileService.create(args.input);
   },
 };
