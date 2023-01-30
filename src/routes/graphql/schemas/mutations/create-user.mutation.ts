@@ -1,13 +1,10 @@
 import { GraphQLFieldConfig, GraphQLNonNull, GraphQLString } from "graphql";
 
+import { UserEntity } from "../../../../utils/DB/entities/DBUsers";
 import { userType } from "../entities/user.type";
 import { ResolverContext } from "../model";
 
-export type CreateUserArgs = {
-  firstName: string;
-  lastName: string;
-  email: string;
-};
+export type CreateUserArgs = Omit<UserEntity, "id" | "subscribedToUserIds">;
 
 export const createUser: GraphQLFieldConfig<any, ResolverContext> = {
   type: new GraphQLNonNull(userType),
@@ -23,14 +20,10 @@ export const createUser: GraphQLFieldConfig<any, ResolverContext> = {
     },
     email: {
       type: new GraphQLNonNull(GraphQLString),
-      description: "Email name of the user",
+      description: "Email of the user",
     },
   },
-  resolve: (
-    _,
-    { firstName, lastName, email }: CreateUserArgs,
-    { db: { users } }
-  ) => {
-    return users.create({ firstName, lastName, email });
+  resolve: (_, args: CreateUserArgs, { services: { userService } }) => {
+    return userService.create(args);
   },
 };

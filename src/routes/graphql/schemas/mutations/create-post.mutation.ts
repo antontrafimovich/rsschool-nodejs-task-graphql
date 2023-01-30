@@ -5,14 +5,11 @@ import {
   GraphQLString,
 } from "graphql";
 
+import { PostEntity } from "../../../../utils/DB/entities/DBPosts";
 import { postType } from "../entities";
 import { ResolverContext } from "../model";
 
-export type CreatePostArgs = {
-  title: string;
-  content: string;
-  userId: string;
-};
+export type CreatePostArgs = Omit<PostEntity, "id">;
 
 export const createPost: GraphQLFieldConfig<any, ResolverContext> = {
   type: new GraphQLNonNull(postType),
@@ -31,7 +28,7 @@ export const createPost: GraphQLFieldConfig<any, ResolverContext> = {
       description: "User id",
     },
   },
-  resolve: (_, args: CreatePostArgs, { db: { posts } }) => {
-    return posts.create(args);
+  resolve: (_, args: CreatePostArgs, { services: { postService } }) => {
+    return postService.create(args);
   },
 };

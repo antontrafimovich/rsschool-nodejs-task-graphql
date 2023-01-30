@@ -42,7 +42,7 @@ export const createProfile: GraphQLFieldConfig<any, ResolverContext> = {
       type: new GraphQLNonNull(GraphQLID),
     },
   },
-  resolve: (_, args: CreateProfileArgs, { db: { profiles } }) => {
-    return profiles.create(args);
+  resolve: (_, args: CreateProfileArgs, { services: { profileService } }) => {
+    return profileService.create(args);
   },
 };

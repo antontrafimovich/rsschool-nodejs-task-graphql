@@ -38,7 +38,11 @@ export const updateMemberType: GraphQLFieldConfig<any, ResolverContext> = {
       description: "Member type update params",
     },
   },
-  resolve: (_, args: UpdateMemberTypeArgs, { db: { memberTypes } }) => {
-    return memberTypes.change(args.id, args.params);
+  resolve: (
+    _,
+    args: UpdateMemberTypeArgs,
+    { services: { memberTypeService } }
+  ) => {
+    return memberTypeService.change(args.id, args.params);
   },
 };

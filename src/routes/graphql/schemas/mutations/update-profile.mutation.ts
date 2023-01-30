@@ -55,7 +55,7 @@ export const updateProfile: GraphQLFieldConfig<any, ResolverContext> = {
       description: "Profile update params",
     },
   },
-  resolve: (_, args: UpdateProfileArgs, { db: { profiles } }) => {
-    return profiles.change(args.id, args.params);
+  resolve: (_, args: UpdateProfileArgs, { services: { profileService } }) => {
+    return profileService.change(args.id, args.params);
   },
 };

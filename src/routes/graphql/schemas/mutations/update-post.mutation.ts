@@ -38,7 +38,7 @@ export const updatePost: GraphQLFieldConfig<any, ResolverContext> = {
       description: "Post update params",
     },
   },
-  resolve: (_, args: UpdatePostArgs, { db: { posts } }) => {
-    return posts.change(args.id, args.params);
+  resolve: (_, args: UpdatePostArgs, { services: { postService } }) => {
+    return postService.change(args.id, args.params);
   },
 };
