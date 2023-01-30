@@ -1,6 +1,6 @@
 import {
+  GraphQLFloat,
   GraphQLID,
-  GraphQLInt,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
@@ -30,7 +30,7 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
       type: sexType,
     },
     birthday: {
-      type: GraphQLInt,
+      type: GraphQLFloat,
     },
     country: {
       type: GraphQLString,
