@@ -8,8 +8,9 @@ import {
 
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
 import { ResolverContext } from "../model";
-import { memberTypeType } from "./member-type.type";
 import { sexType } from "../shared/sex.type";
+import { memberTypeType } from "./member-type.type";
+import { userType } from "./user.type";
 
 export const profileType: GraphQLObjectType = new GraphQLObjectType<
   ProfileEntity,
@@ -50,12 +51,9 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
       },
     },
     user: {
-      type: new GraphQLNonNull(GraphQLID),
-      resolve: (profile, _, { db: { users } }) => {
-        return users.findOne({
-          key: "id",
-          equals: profile.userId,
-        });
+      type: new GraphQLNonNull(userType),
+      resolve: (profile, _, { services: { userService } }) => {
+        return userService.getById(profile.userId);
       },
     },
   }),
