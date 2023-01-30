@@ -4,11 +4,14 @@ import { idParamSchema } from "../../utils/reusedSchemas";
 import { changePostBodySchema, createPostBodySchema } from "./schema";
 
 import type { PostEntity } from "../../utils/DB/entities/DBPosts";
+import { getPostService } from "../../services";
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
+  const postService = getPostService(fastify.db);
+
   fastify.get("/", async function (request, reply): Promise<PostEntity[]> {
-    return fastify.db.posts.findMany();
+    return postService.getAll();
   });
 
   fastify.get(
@@ -21,18 +24,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     async function (request, reply): Promise<PostEntity> {
       const { id } = request.params;
 
-      const result = await fastify.db.posts.findOne({
-        key: "id",
-        equals: id,
-      });
-
-      if (result === null) {
-        return reply
-          .code(404)
-          .send({ error: `Post with id ${id} doesn't exist` });
+      try {
+        return await postService.getById(id);
+      } catch (err) {
+        return reply.code(404).send(err);
       }
-
-      return result;
     }
   );
 
@@ -43,8 +39,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createPostBodySchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {
-      return fastify.db.posts.create(request.body);
+    function (request, reply): Promise<PostEntity> {
+      return postService.create(request.body);
     }
   );
 
@@ -78,7 +74,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       const { id: postIdToUpdate } = request.params;
 
       try {
-        return await fastify.db.posts.change(postIdToUpdate, request.body);
+        return await postService.change(postIdToUpdate, request.body);
       } catch (err) {
         return reply.code(400).send(err);
       }
