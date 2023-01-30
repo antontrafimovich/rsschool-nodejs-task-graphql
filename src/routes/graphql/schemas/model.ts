@@ -1,4 +1,8 @@
-import { ProfileService, UserService } from "../../../services";
+import {
+  MemberTypeService,
+  ProfileService,
+  UserService,
+} from "../../../services";
 import DB from "../../../utils/DB/DB";
 
 export type ResolverContext = {
@@ -6,5 +10,6 @@ export type ResolverContext = {
   services: {
     userService: UserService;
     profileService: ProfileService;
+    memberTypeService: MemberTypeService;
   };
 };

@@ -1,6 +1,7 @@
 import DataLoader = require("dataloader");
 import DB from "../utils/DB/DB";
 import { UserEntity } from "../utils/DB/entities/DBUsers";
+import { isError } from "./utils";
 
 export interface UserService {
   getAll(): Promise<UserEntity[]>;
@@ -19,10 +20,20 @@ export interface UserService {
 }
 
 export const getUserService = (db: DB): UserService => {
-  const batchUserRequests = (ids: readonly string[]) => {
-    return db.users.findMany({
+  const batchUserRequests = async (ids: readonly string[]) => {
+    const result = await db.users.findMany({
       key: "id",
       equalsAnyOf: ids as string[],
+    });
+
+    return ids.map((id) => {
+      const item = result.find((user) => user.id === id);
+
+      if (item) {
+        return item;
+      }
+
+      return new Error(`There's no user with id ${id}`);
     });
   };
 
@@ -49,8 +60,8 @@ export const getUserService = (db: DB): UserService => {
     getById: async (id: string) => {
       const result = loader.load(id);
 
-      if (result === null) {
-        throw new Error(`User with id ${id} doesn't exist`);
+      if (isError(result)) {
+        throw result;
       }
 
       return result;

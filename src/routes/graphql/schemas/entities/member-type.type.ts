@@ -13,7 +13,7 @@ export const memberTypeType: GraphQLObjectType = new GraphQLObjectType<
   ResolverContext
 >({
   name: "MemberType",
-  description: "Type of membership in the app",
+  description: "User profile's member type",
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLString),

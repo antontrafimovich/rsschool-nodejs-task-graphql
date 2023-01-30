@@ -18,7 +18,7 @@ export const postType: GraphQLObjectType = new GraphQLObjectType<
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
-      description: "The id of the user",
+      description: "The id of the post",
     },
     title: {
       type: new GraphQLNonNull(GraphQLString),
@@ -27,12 +27,13 @@ export const postType: GraphQLObjectType = new GraphQLObjectType<
       type: new GraphQLNonNull(GraphQLString),
     },
     user: {
-      type: userType,
-      resolve: (post, _, { db: { users } }) => {
-        return users.findOne({
-          key: "id",
-          equals: post.userId,
-        });
+      type: new GraphQLNonNull(userType),
+      resolve: async (post, _, { services: { userService } }) => {
+        try {
+          return await userService.getById(post.userId);
+        } catch (err) {
+          throw err;
+        }
       },
     },
   }),

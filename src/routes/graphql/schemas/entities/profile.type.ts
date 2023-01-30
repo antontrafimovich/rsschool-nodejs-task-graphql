@@ -17,7 +17,7 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
   ResolverContext
 >({
   name: "Profile",
-  description: "User's profile of an app",
+  description: "User's profile",
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
@@ -43,11 +43,12 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
     },
     memberType: {
       type: memberTypeType,
-      resolve: (profile, _, { db: { memberTypes } }) => {
-        return memberTypes.findOne({
-          key: "id",
-          equals: profile.memberTypeId,
-        });
+      resolve: async (profile, _, { services: { memberTypeService } }) => {
+        try {
+          return await memberTypeService.getById(profile.memberTypeId);
+        } catch (err) {
+          return null;
+        }
       },
     },
     user: {

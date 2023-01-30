@@ -4,11 +4,21 @@ import { idParamSchema } from "../../utils/reusedSchemas";
 import { changeProfileBodySchema, createProfileBodySchema } from "./schema";
 
 import type { ProfileEntity } from "../../utils/DB/entities/DBProfiles";
-import { getProfileService } from "../../services";
+import {
+  getMemberTypeService,
+  getProfileService,
+  getUserService,
+} from "../../services";
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  const profileService = getProfileService(fastify.db);
+  const userService = getUserService(fastify.db);
+  const memberTypeService = getMemberTypeService(fastify.db);
+  const profileService = getProfileService(
+    fastify.db,
+    userService,
+    memberTypeService
+  );
 
   fastify.get("/", function (request, reply): Promise<ProfileEntity[]> {
     return profileService.getAll();

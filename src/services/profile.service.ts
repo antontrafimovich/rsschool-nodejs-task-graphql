@@ -1,6 +1,10 @@
 import DataLoader = require("dataloader");
+
 import DB from "../utils/DB/DB";
 import { ProfileEntity } from "../utils/DB/entities/DBProfiles";
+import { MemberTypeService } from "./member-type.service";
+import { UserService } from "./user.service";
+import { isError } from "./utils";
 
 export interface ProfileService {
   getAll(): Promise<ProfileEntity[]>;
@@ -13,19 +17,12 @@ export interface ProfileService {
   ): Promise<ProfileEntity>;
 }
 
-const isError = (v: unknown): v is Error => {
-  return v instanceof Error;
-};
-
 export const getProfileService = (
-  db: DB
-  //   memberTypeService: MemberTypeService
+  db: DB,
+  userService: UserService,
+  memberTypeService: MemberTypeService
 ) => {
   const profilesByIdBatchLoadFn = async (ids: readonly string[]) => {
-    if (ids.length === 0) {
-      return db.profiles.findMany();
-    }
-
     const result = await db.profiles.findMany({
       key: "id",
       equalsAnyOf: ids as string[],
@@ -49,8 +46,6 @@ export const getProfileService = (
       key: "userId",
       equalsAnyOf: userIds as string[],
     });
-
-    console.log("Find many profiles by user ids result", result);
 
     return userIds.map((userId) => {
       const item = result.find((profile) => profile.userId === userId);
@@ -92,13 +87,10 @@ export const getProfileService = (
     create: async (entity: Omit<ProfileEntity, "id">) => {
       const { userId } = entity;
 
-      const user = await db.users.findOne({
-        key: "id",
-        equals: userId,
-      });
-
-      if (user === null) {
-        throw new Error(`User with id ${userId} doesn't exist.`);
+      try {
+        await userService.getById(userId);
+      } catch (err) {
+        throw err;
       }
 
       const profile = await db.profiles.findOne({
@@ -112,12 +104,9 @@ export const getProfileService = (
 
       const { memberTypeId } = entity;
 
-      const memberType = await db.memberTypes.findOne({
-        key: "id",
-        equals: memberTypeId,
-      });
-
-      if (memberType === null) {
+      try {
+        await memberTypeService.getById(memberTypeId);
+      } catch (err) {
         throw new Error(`Member type with id ${memberTypeId} doesn't exist.`);
       }
 

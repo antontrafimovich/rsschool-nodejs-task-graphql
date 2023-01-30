@@ -61,21 +61,21 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       resolve: async (
         user: UserEntity,
         _args,
-        { db: { memberTypes, profiles } }
+        { services: { profileService, memberTypeService } }
       ) => {
-        const profile = await profiles.findOne({
-          key: "userId",
-          equals: user.id,
-        });
+        let profile;
 
-        if (profile === null) {
+        try {
+          profile = await profileService.getByUserId(user.id);
+        } catch (err) {
           return null;
         }
 
-        return memberTypes.findOne({
-          key: "id",
-          equals: profile.memberTypeId,
-        });
+        try {
+          return await memberTypeService.getById(profile.memberTypeId);
+        } catch (err) {
+          return null;
+        }
       },
     },
     subscribedToUser: {
@@ -83,7 +83,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
       resolve: async (
         user: UserEntity,
         _args,
-        { services: { userService }    }
+        { services: { userService } }
       ) => {
         const result = await userService.getSubscribedToUser(user.id);
 

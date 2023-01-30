@@ -51,8 +51,8 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
     memberTypes: {
       type: new GraphQLList(postType),
       description: "List of member types",
-      resolve: (_, __, { db: { memberTypes } }) => {
-        return memberTypes.findMany();
+      resolve: (_, __, { services: { memberTypeService } }) => {
+        return memberTypeService.getAll();
       },
     },
     user: {
@@ -63,11 +63,12 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
           description: "id of the user",
         },
       },
-      resolve: (_source, { id }, { db: { users } }) => {
-        return users.findOne({
-          key: "id",
-          equals: id,
-        });
+      resolve: async (_source, { id }, { services: { userService } }) => {
+        try {
+          return await userService.getById(id);
+        } catch (err) {
+          return null;
+        }
       },
     },
     post: {
@@ -93,11 +94,12 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
           description: "id of the profile",
         },
       },
-      resolve: (_source, { id }, { db: { profiles } }) => {
-        return profiles.findOne({
-          key: "id",
-          equals: id,
-        });
+      resolve: async (_source, { id }, { services: { profileService } }) => {
+        try {
+          return await profileService.getById(id);
+        } catch (err) {
+          return null;
+        }
       },
     },
     memberType: {
@@ -108,11 +110,12 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
           description: "id of the member type",
         },
       },
-      resolve: (_source, { id }, { db: { memberTypes } }) => {
-        return memberTypes.findOne({
-          key: "id",
-          equals: id,
-        });
+      resolve: async (_source, { id }, { services: { memberTypeService } }) => {
+        try {
+          return await memberTypeService.getById(id);
+        } catch (err) {
+          return null;
+        }
       },
     },
   }),
