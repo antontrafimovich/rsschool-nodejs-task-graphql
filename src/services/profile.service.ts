@@ -39,7 +39,9 @@ export const getProfileService = (
     });
   };
 
-  const profilesByIdsLoader = new DataLoader(profilesByIdBatchLoadFn);
+  const profilesByIdsLoader = new DataLoader(profilesByIdBatchLoadFn, {
+    cache: false,
+  });
 
   const profilesByUserIdBatchLoadFn = async (userIds: readonly string[]) => {
     const result = await db.profiles.findMany({

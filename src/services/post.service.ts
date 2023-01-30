@@ -33,7 +33,9 @@ export const getPostService = (db: DB) => {
     });
   };
 
-  const postsByIdLoader = new DataLoader(postsByIdBatchLoadFn);
+  const postsByIdLoader = new DataLoader(postsByIdBatchLoadFn, {
+    cache: false,
+  });
 
   const postsByUserIdBatchLoadFn = async (userIds: readonly string[]) => {
     const result = await db.posts.findMany({

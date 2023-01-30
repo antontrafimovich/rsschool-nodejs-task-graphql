@@ -8,7 +8,6 @@ import {
 
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
 import { ResolverContext } from "../model";
-import { sexType } from "../shared/sex.type";
 import { memberTypeType } from "./member-type.type";
 import { userType } from "./user.type";
 
@@ -27,7 +26,7 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
       type: GraphQLString,
     },
     sex: {
-      type: sexType,
+      type: GraphQLString,
     },
     birthday: {
       type: GraphQLFloat,
@@ -47,7 +46,7 @@ export const profileType: GraphQLObjectType = new GraphQLObjectType<
         try {
           return await memberTypeService.getById(profile.memberTypeId);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },

@@ -31,7 +31,7 @@ export const getMemberTypeService = (db: DB): MemberTypeService => {
     });
   };
 
-  const loader = new DataLoader(batchMemberTypeRequests);
+  const loader = new DataLoader(batchMemberTypeRequests, { cache: false });
 
   return {
     getAll: () => {

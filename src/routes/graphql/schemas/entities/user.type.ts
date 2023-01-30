@@ -42,7 +42,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         try {
           return await postService.getByUserId(user.id);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },
@@ -56,8 +56,7 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         try {
           return await profileService.getByUserId(user.id);
         } catch (err) {
-          console.error(err);
-          return null;
+          throw err;
         }
       },
     },
@@ -73,13 +72,13 @@ export const userType: GraphQLObjectType = new GraphQLObjectType<
         try {
           profile = await profileService.getByUserId(user.id);
         } catch (err) {
-          return null;
+          throw err;
         }
 
         try {
           return await memberTypeService.getById(profile.memberTypeId);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },

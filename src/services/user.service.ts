@@ -37,7 +37,7 @@ export const getUserService = (db: DB): UserService => {
     });
   };
 
-  const loader = new DataLoader(batchUserRequests);
+  const loader = new DataLoader(batchUserRequests, { cache: false });
 
   const batchSubscribedToUserRequests = async (ids: readonly string[]) => {
     const users = await db.users.findMany();
@@ -51,7 +51,9 @@ export const getUserService = (db: DB): UserService => {
     });
   };
 
-  const subscribedToUserLoader = new DataLoader(batchSubscribedToUserRequests);
+  const subscribedToUserLoader = new DataLoader(batchSubscribedToUserRequests, {
+    cache: false,
+  });
 
   return {
     getAll: () => {

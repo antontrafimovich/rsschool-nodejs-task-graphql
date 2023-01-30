@@ -10,7 +10,6 @@ import {
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
 import { profileType } from "../entities";
 import { ResolverContext } from "../model";
-import { sexType } from "../shared";
 
 export type UpdateProfileArgs = {
   id: string;
@@ -24,7 +23,7 @@ const updateProfileInputType = new GraphQLInputObjectType({
       type: GraphQLString,
     },
     sex: {
-      type: sexType,
+      type: GraphQLString,
     },
     birthday: {
       type: GraphQLInt,

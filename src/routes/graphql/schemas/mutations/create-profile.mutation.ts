@@ -10,7 +10,6 @@ import {
 import { ProfileEntity } from "../../../../utils/DB/entities/DBProfiles";
 import { profileType } from "../entities";
 import { ResolverContext } from "../model";
-import { sexType } from "../shared";
 
 export type CreateProfileArgs = { input: Omit<ProfileEntity, "id"> };
 
@@ -21,7 +20,7 @@ const createProfileInputType = new GraphQLInputObjectType({
       type: new GraphQLNonNull(GraphQLString),
     },
     sex: {
-      type: new GraphQLNonNull(sexType),
+      type: new GraphQLNonNull(GraphQLString),
     },
     birthday: {
       type: new GraphQLNonNull(GraphQLFloat),

@@ -67,7 +67,7 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
         try {
           return await userService.getById(id);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },
@@ -83,7 +83,7 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
         try {
           return await postService.getById(id);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },
@@ -99,7 +99,7 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
         try {
           return await profileService.getById(id);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },
@@ -115,7 +115,7 @@ export const queryType = new GraphQLObjectType<Query, ResolverContext>({
         try {
           return await memberTypeService.getById(id);
         } catch (err) {
-          return null;
+          throw err;
         }
       },
     },
